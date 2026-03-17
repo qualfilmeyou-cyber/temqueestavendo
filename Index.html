@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renovação de Contrato Vitalício</title>
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ffb3c1;
+            --bg: #fff0f3;
+            --text: #590d22;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Impede que a tela role com o botão fugindo */
+            color: var(--text);
+        }
+
+        .contract-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid white;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 10px; color: var(--primary); }
+        p { font-size: 1rem; line-height: 1.5; margin-bottom: 20px; }
+
+        .contract-text {
+            text-align: left;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Container para o botão que foge */
+        .btn-game-container {
+            position: relative;
+            width: 100%;
+            height: 150px; /* Área onde o botão pode correr */
+            margin-top: 20px;
+            overflow: hidden; /* Botão não sai daqui */
+        }
+
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #btn-accept {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+            position: relative;
+            z-index: 3;
+            width: 100%; /* Ocupa a largura total para ser fácil de clicar */
+            margin-bottom: 10px;
+        }
+
+        #btn-reject {
+            background-color: #555; /* Cor mais escura para visibilidade */
+            color: white;
+            position: absolute; /* Importante para fugir */
+            z-index: 1;
+            /* Tamanho inicial travado */
+            width: 160px; 
+            height: 50px;
+            /* Centraliza inicialmente */
+            left: calc(50% - 80px);
+            top: 50px; 
+            transition: left 0.1s ease, top 0.1s ease; /* Animação suave da fuga */
+        }
+
+        /* Corações de fundo */
+        .heart {
+            position: absolute;
+            color: var(--secondary);
+            font-size: 20px;
+            user-select: none;
+            pointer-events: none;
+            animation: float 5s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Estilos do Popup (Modal) Customizado */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none; /* Escondido por padrão */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 2px solid var(--primary);
+        }
+
+        .modal-content h2 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .modal-content p {
+            color: var(--text);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-content button {
+            background-color: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="contract-card">
+        <h1>Termo de Renovação ❤️</h1>
+        <p>Referente aos 2 anos de muito amor, risadas e paciência (principalmente dela).</p>
+        
+        <div class="contract-text">
+            <strong>CLÁUSULA 2026:</strong> Fica estabelecido que o "Contrato de Namoro" não possui botão de cancelamento funcional. Tentativas de evasão resultam em 100x mais beijos.
+        </div>
+
+        <p><strong>Deseja cancelar o contrato hoje?</strong></p>
+        
+        <button id="btn-accept" onclick="abrirModal()">RENOVAR POR MAIS 100 ANOS</button>
+
+        <div class="btn-game-container">
+            <button id="btn-reject" onmouseover="fugir()" onclick="fugir()" ontouchstart="fugir()">CANCELAR</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h2>✅ Sucesso!</h2>
+            <p>Renovação concluída com sucesso! Parabéns, Príncipe! Você acaba de assinar o plano 'Amor Eterno Premium'. Não há reembolso disponível. ❤️</p>
+            <button onclick="fecharModal()">Eba!</button>
+        </div>
+    </div>
+
+    <script>
+        // Cria corações de fundo
+        function createHearts() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createHearts, 300);
+
+        // Lógica do botão que foge DENTRO do container
+        const btnReject = document.getElementById('btn-reject');
+        const container = document.querySelector('.btn-game-container');
+        
+        function fugir() {
+            // Calcula os limites baseados no tamanho do container e do botão
+            const maxX = container.offsetWidth - btnReject.offsetWidth;
+            const maxY = container.offsetHeight - btnReject.offsetHeight;
+
+            // Gera posições aleatórias dentro desses limites
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
+            // Aplica as novas posições
+            btnReject.style.left = x + 'px';
+            btnReject.style.top = y + 'px';
+        }
+
+        // Funções do Modal Customizado
+        const modalOverlay = document.getElementById('modalOverlay');
+
+        function abrirModal() {
+            modalOverlay.style.display = 'flex';
+            // Efeito extra de corações ao aceitar
+            for(let i=0; i<30; i++) {
+                setTimeout(createHearts, i * 100);
+            }
+        }
+
+        function fecharModal() {
+            modalOverlay.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
